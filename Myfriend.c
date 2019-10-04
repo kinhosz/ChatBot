@@ -3,12 +3,11 @@
 #include <string.h>
 
 void notice(int x){
-
-
 	if(x==1){
 		system("clear");
 		printf("ATTENTION :::::Dado incorreto:::::ATTENTION\n\n");
 	}
+
 	printf("********************************\n");
 	printf("* Quero conversar:   PRESS <1> *\n");
 	printf("* Sou Administrador: PRESS <2> *\n");
@@ -76,12 +75,10 @@ void print(char BOX[][100]){
 }
 
 void talk(){
-	
 	FILE *arq;
 	int count;
 	int tam;
-	char **perg;
-	char **resp;
+	char **perg, **resp;
 	char BOX[5][100];
 	char msg[100],send[100];
 	int i,j,ouro;
@@ -89,30 +86,35 @@ void talk(){
 	system("clear");
 	printf("Iniciando......\n");
 
+	// INICIALIZA AS PERGUNTAS.
 	arq = fopen("ask.txt","r");
 	if(arq == NULL){
 		printf("falha ao abrir arquivo(ask)\n");
 		exit(1);
 	}
-	count = 0;
+	count = 0; // contabiliza o número de palavras no arquivo.
 	while(fgets(msg,100,arq)!=NULL){
 		count++;
 	}
 	rewind(arq);
-	perg = (char **) malloc(count * sizeof(char *));
+
+	perg = (char **) malloc(count * sizeof(char *)); // aloca memória para o vetor de strings.
 	for(i=0;i<count;i++){
 		perg[i] = (char *) malloc(100 * sizeof(char));
 	}
-	j = 0;
-	while(fgets(msg,100,arq)!=NULL){
+
+	j = 0; 
+	while(fgets(msg,100,arq)!=NULL){ // salva as perguntas do arquivo 'ask.txt' no vetor.
 		tam = strlen(msg);
 		msg[tam-1] = '\0';
 		strcpy(perg[j],msg);
 		j++;
 	}
 	fclose(arq);
+
+	// INICIALIZA AS RESPOSTAS.
 	arq = fopen("ans.txt","r");
-	if(arq == NULL){
+	if(arq == NULL){ // caso o arquivo de respostas não possa ser aberto, libera a memória alocada anteriormente.
 		printf("falha ao abrir arquivo(ans)\n");
 		for(i=0;i<count;i++){
 			free(perg[i]);
@@ -120,20 +122,24 @@ void talk(){
 		free(perg);
 		exit(1);
 	}
-	resp = (char **) malloc(count * sizeof(char *));
+
+	resp = (char **) malloc(count * sizeof(char *)); // aloca memória para o vetor de strings.
 	for(i=0;i<count;i++){
 		resp[i] = (char *) malloc(100 * sizeof(char));
 	}
+
 	j = 0;
-	while(fgets(msg,100,arq)!=NULL){
+	while(fgets(msg,100,arq)!=NULL){ // salva as perguntas do arquivo 'ask.txt' no vetor.
 		tam = strlen(msg);
 		msg[tam-1] = '\0';
 		strcpy(resp[j],msg);
 		j++;
 	}
 	fclose(arq);
+
+	// INICIALIZA O ARQUIVO QUE NÃO ENTENDI PRA QUÊ SERVE.
 	arq = fopen("question.txt","a");
-	if(arq == NULL){
+	if(arq == NULL){ // caso o arquivo de respostas não possa ser aberto, libera a memória alocada anteriormente.
 		printf("falha ao abrir arquivo(question)\n");
 		for(i=0;i<count;i++){
 			free(resp[i]);
@@ -145,7 +151,9 @@ void talk(){
 	for(i=0;i<5;i++){
 		strcpy(BOX[i]," ");
 	}
-	strcpy(BOX[0],"Digite (SAIR) em maiusculo. Para sair do chat");
+	strcpy(BOX[0],"Digite (SAIR) em maiusculo para sair do chat.");
+	
+	// LOOP PRINCIPAL.
 	while(1){
 		print(BOX);
 		scanf(" %[^\n]",msg);
@@ -165,11 +173,11 @@ void talk(){
 				break;
 			}
 		}
-		strcpy(send,"friend: ");
+		strcpy(send,"MyFriend: ");
 		if(ouro == -1){
 			fputs(msg,arq);
 			fputc('\n',arq);
-			strcat(send,"Estou em fase de teste. Nao sei responder isso ainda");
+			strcat(send,"Estou em fase de teste. Nao sei responder isso ainda...");
 		}
 		else{
 			strcat(send,resp[ouro]);
@@ -311,19 +319,24 @@ void adm(){
 
 
 int main(){
-	
 	int mod;
-
 	system("clear");
 
 	printf("\t*****Seja Bem-vindo ao \"Myfriend\"*****\n\n");
 	notice(2);
 	mod = menu();
-	if(mod == 1){
-		talk();
-	}
-	else if(mod == 2){
-		adm();
+	switch(mod) {
+		case 1:
+			talk();
+		break;
+
+		case 2:
+			adm();
+		break;
+
+		default:
+			notice(1);
+		break;
 	}
 
 	return 0;
